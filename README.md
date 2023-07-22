@@ -1,4 +1,9 @@
 # spotify_switcher
 Application to make switching music services easier
 
-Outputs a CSV list that can be used as input for a webscraper to collate a new playlist in another streaming platform. 
+Calls the Spotify to pull tracks from a playlist and outputs a CSV list that can be used as input for a webscraper to collate a new playlist in another streaming platform. 
+
+Required .env vars
+CLIENT_ID - Spotify Developer Client ID
+CLIENT_SECRET - Spotify Developer Client Secret
+PLAYLIST_ID - Playlist ID 

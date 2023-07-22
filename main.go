@@ -6,13 +6,16 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 
+	"github.com/go-rod/rod"
+	"github.com/go-rod/rod/lib/launcher"
 	"github.com/joho/godotenv"
 
 	"github.com/Jeffail/gabs"
 
-	"github.com/jwtly10/spotify_switcher/auth"
+	"github.com/jwtly10/spotify_switcher/scraper"
 )
 
 func init() {
@@ -23,12 +26,26 @@ func init() {
 }
 
 func main() {
-	spotifyToken := auth.GetAuthToken()
 
-	savedTracks := getPlaylistTracks(spotifyToken, os.Getenv("PLAYLIST_ID"))
+	loaded := 0
 
-	writeResultsToCSV(savedTracks)
-	fmt.Println("Done!")
+	// Load Browser
+	url, _ := launcher.NewUserMode().Launch()
+	browser := rod.New().ControlURL(url).MustConnect()
+
+	// Load Apple Music
+	page := browser.MustPage("https://music.apple.com/gb/search").MustWaitLoad()
+	loaded = loaded + scraper.ScrapeAppleMusic(page, "No More This Time", "D-Block Europe, Chip")
+	// loaded = loaded + scraper.ScrapeAppleMusic(page, "Blame Game", "Janye West, John Legend")
+
+	fmt.Println(strconv.Itoa(loaded) + " songs loaded")
+
+	// spotifyToken := auth.GetAuthToken()
+
+	// savedTracks := getPlaylistTracks(spotifyToken, os.Getenv("PLAYLIST_ID"))
+
+	// writeResultsToCSV(savedTracks)
+	// fmt.Println("Done!")
 
 }
 

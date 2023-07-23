@@ -35,8 +35,8 @@ func main() {
 
 	// Load Apple Music
 	page := browser.MustPage("https://music.apple.com/gb/search").MustWaitLoad()
-	loaded = loaded + scraper.ScrapeAppleMusic(page, "No More This Time", "D-Block Europe, Chip")
-	// loaded = loaded + scraper.ScrapeAppleMusic(page, "Blame Game", "Janye West, John Legend")
+	loaded = loaded + scraper.ScrapeAppleMusic(page, "June 23nd", "Lil Tjay")
+	loaded = loaded + scraper.ScrapeAppleMusic(page, "Blame Game", "Janye West, John Legend")
 
 	fmt.Println(strconv.Itoa(loaded) + " songs loaded")
 

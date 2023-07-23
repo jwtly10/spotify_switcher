@@ -15,6 +15,7 @@ import (
 
 	"github.com/Jeffail/gabs"
 
+	"github.com/jwtly10/spotify_switcher/auth"
 	"github.com/jwtly10/spotify_switcher/scraper"
 )
 
@@ -25,47 +26,42 @@ func init() {
 	}
 }
 
+type Track struct {
+	song   string
+	artist string
+}
+
 func main() {
 
-	loaded := 0
+	spotifyToken := auth.GetAuthToken()
+	savedTracks := getPlaylistTracks(spotifyToken, os.Getenv("PLAYLIST_ID"))
+
+	fmt.Println(strconv.Itoa(len(savedTracks)) + " Songs loaded from Spotify")
 
 	// Load Browser
 	url, _ := launcher.NewUserMode().Launch()
 	browser := rod.New().ControlURL(url).MustConnect()
-
-	// Load Apple Music
 	page := browser.MustPage("https://music.apple.com/gb/search").MustWaitLoad()
-	loaded = loaded + scraper.ScrapeAppleMusic(page, "June 23nd", "Lil Tjay")
-	loaded = loaded + scraper.ScrapeAppleMusic(page, "Blame Game", "Janye West, John Legend")
+
+	loaded := 0
+	for _, track := range savedTracks {
+		loaded = loaded + scraper.ScrapeAppleMusic(page, track.song, track.artist)
+	}
 
 	fmt.Println(strconv.Itoa(loaded) + " songs loaded")
-
-	// spotifyToken := auth.GetAuthToken()
-
-	// savedTracks := getPlaylistTracks(spotifyToken, os.Getenv("PLAYLIST_ID"))
-
-	// writeResultsToCSV(savedTracks)
-	// fmt.Println("Done!")
-
 }
 
-func getPlaylistTracks(apiToken string, playlistID string) []string {
+func getPlaylistTracks(apiToken string, playlistID string) []Track {
 	fmt.Println("Getting playlist tracks...")
 	endpoint := "https://api.spotify.com/v1/playlists/" + playlistID + "/tracks"
 
-	results := []string{}
+	results := []Track{}
 	results = recursivelyGetResults(results, endpoint, apiToken)
-
-	// fmt.Println(len(results))
-
-	// for x := 0; x < 10; x++ {
-	// 	fmt.Println(results[x])
-	// }
 
 	return results
 }
 
-func recursivelyGetResults(results []string, url_call string, apiToken string) []string {
+func recursivelyGetResults(results []Track, url_call string, apiToken string) []Track {
 	req, err := http.NewRequest("GET", url_call, nil)
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Add("Authorization", "Bearer "+apiToken)
@@ -101,7 +97,10 @@ func recursivelyGetResults(results []string, url_call string, apiToken string) [
 		for y := 0; y < numberOfArtists; y++ {
 			artists = append(artists, jsonParsed.Search("items", "track").Index(x).Path("artists").Index(y).Path("name").Data().(string))
 		}
-		results = append(results, name+", "+strings.Join(artists, ", "))
+
+		artist := strings.Join(artists, ", ")
+		track := Track{name, artist}
+		results = append(results, track)
 		artists = nil
 	}
 
@@ -112,7 +111,7 @@ func recursivelyGetResults(results []string, url_call string, apiToken string) [
 	return results
 }
 
-func writeResultsToCSV(result []string) {
+func writeResultsToCSV(result []Track) {
 	csvFile, err := os.Create("results.csv")
 	if err != nil {
 		log.Fatal(err)
@@ -120,7 +119,7 @@ func writeResultsToCSV(result []string) {
 	defer csvFile.Close()
 
 	for _, row := range result {
-		_, err := csvFile.WriteString(row + "\n")
+		_, err := csvFile.WriteString(row.song + ", " + row.artist + "\n")
 		if err != nil {
 			log.Fatal(err)
 		}

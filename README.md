@@ -3,7 +3,7 @@ GO Application to make switching music services easier
 
 I wanted to try Apple Music but could never use it properly as most of my music playlist was missing. This CLI tool fixes that. 
 
-It uses Spotify dev API to pull playlist data, and scrapes the Apple Music site to save all of the songs from Spotify.
+It uses Spotify dev API to pull playlist data, and scrapes the Apple Music site to save all of the songs from Spotify. Can also be set to headless where an instance of Chrome is opened, but hidden.
 
 Required .env vars
 CLIENT_ID - Spotify Developer Client ID

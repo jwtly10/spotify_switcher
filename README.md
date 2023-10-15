@@ -14,3 +14,5 @@ Demo:
 
 https://github.com/jwtly10/spotify_switcher/assets/39057715/4a802c27-e8f9-4c5d-8b27-2c703d59a12c
 
+
+<img width="1664" alt="spotify-switcher" src="https://github.com/jwtly10/spotify_switcher/assets/39057715/cf18af2c-a08c-47b5-94dc-daf33d40a35a">
